@@ -12,4 +12,4 @@ export const getBooksShelfs=async (books)=>{
   ))
 }
 
-export const arrayToText = (array)=> array.toString().replace(',',' and ')
+export const arrayToText = (array)=> (typeof array!=='undefined' && array.length>0)?array.toString().replace(',',' and '):'uknown author'

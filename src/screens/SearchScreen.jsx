@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getAll } from '../BooksAPI';
+import { getAll, search } from '../BooksAPI';
 import { BooksContext } from '../context/BooksContext';
 import Book from '../components/Book/Book';
 import { arrayToText, getBooksShelfs } from '../utils';
@@ -36,14 +36,20 @@ const SearchScreen = (props) => {
     }
   }
 
-  const searchBooks=()=>{
-    const result= books.filter((item)=>{
-      const search= searchText.toLowerCase();
+  const searchBooks=async ()=>{
+    if(searchText.length<3){
+      setState((pv)=>({...pv,searchedBooks:[]}));
+      return;
+    }
+    const result=books.filter((item)=>{
+      const search= searchText.toLowerCase().replace(/[\/\\]/g,'');
       const title=item.title.toLowerCase();
       const authors=item?.authors[0].toLowerCase();
       return title.search(search)!==-1 || authors.search(search) !==-1;
     });
-    setState((pv)=>({...pv,searchedBooks:result}));
+    let bookSearch=await search(searchText);
+    bookSearch=(bookSearch.length>1)?bookSearch:[]
+    setState((pv)=>({...pv,searchedBooks:[...result,...bookSearch]}));
   }
 
   useEffect(()=>{
@@ -74,9 +80,9 @@ const SearchScreen = (props) => {
       <div className="search-books-results">
         <ol className="books-grid">
         {
-          searchedBooks.map((item,index)=>(
-            <li key={`search${item.title}${index}`}><Book bookID={item.id} title={item.title} author={arrayToText(item?.authors)} image={item.imageLinks.thumbnail}/></li>
-          ))
+          (searchedBooks.length>0) && (searchedBooks.map((item,index)=>(
+            <li key={`search${item.title}${index}`}><Book bookID={item.id} title={item.title} author={arrayToText(item?.authors)} image={item?.imageLinks?.thumbnail}/></li>
+          )))
         }
         </ol>
       </div>
@@ -84,4 +90,4 @@ const SearchScreen = (props) => {
   )
 }
 
-export default SearchScreen;
+export default React.memo(SearchScreen);
