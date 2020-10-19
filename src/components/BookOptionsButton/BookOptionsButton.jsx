@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { update } from '../../BooksAPI';
-import { BooksContext } from '../../context/books';
+import { BooksContext } from '../../context/BooksContext';
 
 const BookOptionsButton = ({bookID})=>{
 
@@ -14,7 +14,7 @@ const BookOptionsButton = ({bookID})=>{
     return(
         <div className="book-shelf-changer">
           <select onChange={onSelect}>
-              <option value="move" disabled>Move to...</option>
+              <option value="move" selected disabled>Move to...</option>
               <option value="currentlyReading">Current Reading</option>
               <option value="wantToRead">Want to Read</option>
               <option value="read">Read</option>

@@ -10,8 +10,8 @@ const Shelf= ({shelfName,books})=>{
         <ol className="books-grid">
           {
             books.map((item,index)=>(
-              <li>
-                <Book key={`book${shelfName}${item?.title}${index}`} bookID={item.id} title={item?.title} author={arrayToText(item.authors)} image={item?.imageLinks?.thumbnail} />
+              <li  key={`book${shelfName}${item?.title}${index}`}>
+                <Book bookID={item.id} title={item?.title} author={arrayToText(item.authors)} image={item?.imageLinks?.thumbnail} />
               </li>
             ))
           }

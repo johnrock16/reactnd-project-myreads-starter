@@ -2,7 +2,7 @@ import React,{useContext, useEffect,useState} from 'react';
 import {Link} from 'react-router-dom';
 import { getAll } from '../BooksAPI';
 import Shelf from '../components/Shelf/Shelf';
-import { BooksContext } from '../context/books';
+import { BooksContext } from '../context/BooksContext';
 import { getBooksShelfs} from '../utils';
 
 const initialState={
@@ -34,7 +34,6 @@ const MainScreen= ()=>{
   },[])
 
   useEffect(()=>{
-    console.log(booksContext)
     if(booksContext.refreshBooks){
       booksContext.refresh(false);
       getAllBooks(true)
