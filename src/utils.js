@@ -13,3 +13,5 @@ export const getBooksShelfs=async (books)=>{
       books.filter((itemBooks)=>itemShelfs==itemBooks.shelf)
     ))
   }
+
+export const arrayToText = (array)=> array.toString().replace(',',' and ')

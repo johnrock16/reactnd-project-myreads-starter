@@ -1,4 +1,5 @@
 import React from 'react';
+import { arrayToText } from '../../utils';
 import Book from '../Book/Book';
 
 const Shelf= ({shelfName,books})=>{
@@ -10,7 +11,7 @@ const Shelf= ({shelfName,books})=>{
           {
             books.map((item,index)=>(
               <li>
-                <Book key={`book${shelfName}${item?.title}${index}`} title={item?.title} author={item?.authors[0]} image={item?.imageLinks?.thumbnail} />
+                <Book key={`book${shelfName}${item?.title}${index}`} bookID={item.id} title={item?.title} author={arrayToText(item.authors)} image={item?.imageLinks?.thumbnail} />
               </li>
             ))
           }

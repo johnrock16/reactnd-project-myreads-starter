@@ -2,19 +2,21 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAll } from '../BooksAPI';
 import { BooksContext } from '../context/books';
-import { getBooksShelfs } from '../utils';
+import Book from '../components/Book/Book';
+import { arrayToText, getBooksShelfs } from '../utils';
 
 const initialState={
   booksShelf:[],
   books:[],
   searchText:'',
+  searchBooks:[],
 }
 
 const SearchScreen = (props) => {
   const [state,setState] = useState(initialState)
   const booksContext= useContext(BooksContext);
 
-  const {books,booksShelf,searchText} = state;
+  const {books,booksShelf,searchText,searchBooks} = state;
 
   const onHandleSearchText=(event)=>{
     const searchText=event.target.value;
@@ -39,8 +41,13 @@ const SearchScreen = (props) => {
   },[])
 
   useEffect(()=>{
-    const result= books.filter((item)=>item.title.search(searchText)!=-1);
-    console.log(result);
+    const result= books.filter((item)=>{
+      const search= searchText.toLowerCase();
+      const title=item.title.toLowerCase();
+      const authors=item?.authors[0].toLowerCase();
+      return title.search(search)!=-1 || authors.search(search) !=-1;
+    });
+    setState((pv)=>({...pv,searchBooks:result}));
   },[state?.searchText])
 
   return (
@@ -61,7 +68,13 @@ const SearchScreen = (props) => {
         </div>
       </div>
       <div className="search-books-results">
-        <ol className="books-grid"></ol>
+        <ol className="books-grid">
+        {
+          searchBooks.map((item,index)=>(
+            <li><Book key={`search${item.title}${index}`} bookID={item.id} title={item.title} author={arrayToText(item?.authors)} image={item.imageLinks.thumbnail}/></li>
+          ))
+        }
+        </ol>
       </div>
     </div>
   )

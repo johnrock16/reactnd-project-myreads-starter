@@ -16,8 +16,8 @@ const MainScreen= ()=>{
   const {booksShelf} = state;
 
 
-  const getAllBooks=async ()=>{
-    if(booksContext?.booksShelf.length>0 && booksContext.booksShelf.length>0){
+  const getAllBooks=async (forced=true)=>{
+    if(!forced && booksContext?.booksShelf.length>0 && booksContext.booksShelf.length>0){
       setState((pv)=>({...pv,booksShelf:booksContext.booksShelf,books:booksContext.books}));
     }
     else{
@@ -34,9 +34,12 @@ const MainScreen= ()=>{
   },[])
 
   useEffect(()=>{
-    console.log(state);
-    console.log('contexto',booksContext);
-  },[booksContext])
+    console.log(booksContext)
+    if(booksContext.refreshBooks){
+      booksContext.refresh(false);
+      getAllBooks(true)
+    }
+  },[booksContext.refreshBooks])
 
   return(
     <div className="list-books">

@@ -1,11 +1,21 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { update } from '../../BooksAPI';
+import { BooksContext } from '../../context/books';
 
-const BookOptionsButton = ()=>{
+const BookOptionsButton = ({bookID})=>{
+
+    const booksContext= useContext(BooksContext);
+
+    const onSelect = async (event)=>{
+        await update(bookID,event.target.value)
+        booksContext.refresh(true);
+    }
+
     return(
         <div className="book-shelf-changer">
-          <select>
+          <select onChange={onSelect}>
               <option value="move" disabled>Move to...</option>
-              <option value="currentlyReading">Currently Reading</option>
+              <option value="currentlyReading">Current Reading</option>
               <option value="wantToRead">Want to Read</option>
               <option value="read">Read</option>
               <option value="none">None</option>
