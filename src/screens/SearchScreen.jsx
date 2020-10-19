@@ -16,10 +16,10 @@ const SearchScreen = (props) => {
   const [state,setState] = useState(initialState)
   const booksContext= useContext(BooksContext);
 
-  const {books,booksShelf,searchText,searchedBooks} = state;
+  const {books,searchText,searchedBooks} = state;
 
   const onHandleSearchText=(event)=>{
-    const searchText=event.target.value;
+    const searchText=`${event.target.value}`;
     setState((pv)=>({...pv,searchText}));
   }
 
@@ -41,7 +41,7 @@ const SearchScreen = (props) => {
       const search= searchText.toLowerCase();
       const title=item.title.toLowerCase();
       const authors=item?.authors[0].toLowerCase();
-      return title.search(search)!=-1 || authors.search(search) !=-1;
+      return title.search(search)!==-1 || authors.search(search) !==-1;
     });
     setState((pv)=>({...pv,searchedBooks:result}));
   }
@@ -52,7 +52,7 @@ const SearchScreen = (props) => {
 
   useEffect(()=>{
     searchBooks();
-  },[state?.searchText])
+  },[searchText])
 
   return (
     <div className="search-books">

@@ -13,8 +13,8 @@ const BookOptionsButton = ({bookID})=>{
 
     return(
         <div className="book-shelf-changer">
-          <select onChange={onSelect}>
-              <option value="move" selected disabled>Move to...</option>
+          <select onChange={onSelect} defaultValue={'move'}>
+              <option value="move" disabled>Move to...</option>
               <option value="currentlyReading">Current Reading</option>
               <option value="wantToRead">Want to Read</option>
               <option value="read">Read</option>
