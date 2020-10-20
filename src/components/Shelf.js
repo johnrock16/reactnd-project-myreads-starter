@@ -11,7 +11,7 @@ const Shelf= ({shelfName,books})=>{
           {
             books.map((item,index)=>(
               <li  key={`book${shelfName}${item?.title}${index}`}>
-                <Book bookID={item.id} title={item?.title} author={arrayToText(item.authors)} image={item?.imageLinks?.thumbnail} />
+                <Book bookID={item.id} shelf={item.shelf} title={item?.title} author={arrayToText(item.authors)} image={item?.imageLinks?.thumbnail} />
               </li>
             ))
           }

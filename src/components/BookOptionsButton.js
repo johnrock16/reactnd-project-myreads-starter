@@ -1,19 +1,31 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { update } from '../BooksAPI';
 import { BooksContext } from '../context/BooksContext';
 
-const BookOptionsButton = ({bookID})=>{
+const initialState={
+    shelf:''
+}
+
+const BookOptionsButton = ({bookID,bookShelf})=>{
+    const [state,setState] = useState(initialState)
+    const {shelf} = state;
 
     const booksContext= useContext(BooksContext);
 
     const onSelect = async (event)=>{
-        await update(bookID,event.target.value)
+        const {value}=event.target;
+        await update(bookID,value)
         booksContext.refresh(true);
+        setState((pv)=>({...pv,shelf:value}));
     }
+
+    React.useEffect(() => {
+        setState((pv)=>({...pv,shelf:bookShelf}));
+    }, [])
 
     return(
         <div className="book-shelf-changer">
-          <select onChange={onSelect} defaultValue={'move'}>
+          <select onChange={onSelect} value={(typeof shelf!=='undefined')?shelf:'none'}>
               <option value="move" disabled>Move to...</option>
               <option value="currentlyReading">Current Reading</option>
               <option value="wantToRead">Want to Read</option>
@@ -24,4 +36,4 @@ const BookOptionsButton = ({bookID})=>{
     )
 }
 
-export default BookOptionsButton;
+export default React.memo(BookOptionsButton);

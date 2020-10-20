@@ -1,11 +1,11 @@
 export const getBooksShelfs=async (books)=>{
   let shelfs=[]
 
-  books.filter((item)=>{
-    if(shelfs.indexOf(item.shelf)===-1){
-      shelfs.push(item.shelf)
+  for(let item in books){
+    if(shelfs.indexOf(books[item].shelf)===-1){
+      shelfs.push(books[item].shelf)
     }
-  })
+  }
 
   return shelfs.map((itemShelfs)=>(
     books.filter((itemBooks)=>itemShelfs===itemBooks.shelf)

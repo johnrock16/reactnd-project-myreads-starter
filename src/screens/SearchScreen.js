@@ -1,13 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getAll, search } from '../BooksAPI';
+import { search } from '../BooksAPI';
 import { BooksContext } from '../context/BooksContext';
 import Book from '../components/Book';
-import { arrayToText, getBooksShelfs } from '../utils';
-import Shelf from '../components/Shelf';
+import { arrayToText } from '../utils';
 
 const initialState={
-  booksShelf:[],
   books:[],
   searchText:'',
   searchedBooks:[],
@@ -17,7 +15,7 @@ const SearchScreen = (props) => {
   const [state,setState] = useState(initialState)
   const booksContext= useContext(BooksContext);
 
-  const {books,searchText,booksShelf,searchedBooks} = state;
+  const {books,searchText,searchedBooks} = state;
 
   const onHandleSearchText=(event)=>{
     const searchText=`${event.target.value}`;
@@ -33,14 +31,21 @@ const SearchScreen = (props) => {
     const bookSearch=await search(searchText);
 
     const bookSearchShelfs=books.filter((item)=>{
-      const search= searchText.toLowerCase().replace(/[\/\\]/g,'');
+      const search= searchText.toLowerCase().replace(/[\\]/g,'');
       const title=item.title.toLowerCase();
       const authors=item?.authors[0].toLowerCase();
       return (title.search(search)!==-1 || authors.search(search) !==-1);
     });
-    
-    const result=(typeof bookSearch!=='undefined' && bookSearch.length>1)?bookSearch:bookSearchShelfs;
-    setState((pv)=>({...pv,searchedBooks:result}));
+
+    const idBooks=bookSearchShelfs.map((item)=>(item.id));
+
+    let searchResults=bookSearchShelfs;
+    if(typeof bookSearch!=='undefined' && bookSearch.length>1){
+      searchResults= [...searchResults,...bookSearch].filter((item)=>(
+        !(idBooks.indexOf(item.id) !== -1 && typeof item.shelf ==='undefined')
+      ));
+    }
+    setState((pv)=>({...pv,searchedBooks:searchResults}));
   }
 
   useEffect(()=>{
@@ -70,7 +75,9 @@ const SearchScreen = (props) => {
         <ol className="books-grid">
         {
           (searchText.length>2 && (typeof searchedBooks!=='undefined' && searchedBooks.length>0)) && (searchedBooks.map((item,index)=>(
-            <li key={`search${item.title}${index}`}><Book bookID={item.id} title={item.title} author={arrayToText(item?.authors)} image={item?.imageLinks?.thumbnail}/></li>
+            <li key={`search${item.title}${index}`}>
+              <Book bookID={item.id} title={item.title} author={arrayToText(item?.authors)} shelf={item?.shelf} image={item?.imageLinks?.thumbnail}/>
+            </li>
           )))
         }
         </ol>
