@@ -1,9 +1,7 @@
 import React,{useContext, useEffect,useState} from 'react';
 import {Link} from 'react-router-dom';
-import { getAll } from '../BooksAPI';
 import Shelf from '../components/Shelf';
 import { BooksContext } from '../context/BooksContext';
-import { getBooksShelfs} from '../utils';
 
 const initialState={
   booksShelf:[],
@@ -15,28 +13,19 @@ const MainScreen= ()=>{
 
   const {booksShelf} = state;
 
-
-  const getAllBooks=async (forced=true)=>{
-    if(!forced && booksContext?.booksShelf.length>0 && booksContext.booksShelf.length>0){
-      setState((pv)=>({...pv,booksShelf:booksContext.booksShelf,books:booksContext.books}));
-    }
-    else{
-      const books= await getAll();
-      const booksShelf=await getBooksShelfs(books);
-  
-      setState((pv)=>({...pv,booksShelf,books}));
-      booksContext.setState((pv)=>({...pv,books,booksShelf}))
-    }
+  const listAllBooks=async (forced=false)=>{
+    const listBooks=await booksContext.getAllBooks(forced);
+    setState((pv)=>({...pv,booksShelf:listBooks.booksShelf,books:listBooks.books}))
   }
 
   useEffect(()=>{
-    getAllBooks();
+    listAllBooks();
   },[])
 
   useEffect(()=>{
     if(booksContext.refreshBooks){
       booksContext.refresh(false);
-      getAllBooks(true)
+      listAllBooks(true)
     }
   },[booksContext.refreshBooks])
 
@@ -59,4 +48,4 @@ const MainScreen= ()=>{
   )
 }
 
-export default MainScreen;
+export default React.memo(MainScreen);
