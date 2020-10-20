@@ -1,6 +1,6 @@
 import React from 'react';
-import { arrayToText } from '../../utils';
-import Book from '../Book/Book';
+import { arrayToText } from '../utils';
+import Book from './Book';
 
 const Shelf= ({shelfName,books})=>{
   return(

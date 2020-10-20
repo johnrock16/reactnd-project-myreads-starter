@@ -1,5 +1,5 @@
 import React from 'react';
-import BookOptionsButton from '../BookOptionsButton/BookOptionsButton';
+import BookOptionsButton from './BookOptionsButton';
 
 const Book=({bookID,title,author,image})=>{
   return(

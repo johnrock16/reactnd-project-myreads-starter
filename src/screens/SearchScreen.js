@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAll, search } from '../BooksAPI';
 import { BooksContext } from '../context/BooksContext';
-import Book from '../components/Book/Book';
+import Book from '../components/Book';
 import { arrayToText, getBooksShelfs } from '../utils';
 
 const initialState={
@@ -23,8 +23,8 @@ const SearchScreen = (props) => {
     setState((pv)=>({...pv,searchText}));
   }
 
-  const getListBooks=async ()=>{
-    if(booksContext?.booksShelf.length>0 && booksContext.booksShelf.length>0){
+  const getListBooks=async (forced=false)=>{
+    if(!forced && booksContext?.booksShelf.length>0 && booksContext.booksShelf.length>0){
       setState((pv)=>({...pv,booksShelf:booksContext.booksShelf,books:booksContext.books}));
     }
     else{
@@ -55,6 +55,13 @@ const SearchScreen = (props) => {
   useEffect(()=>{
     getListBooks();
   },[])
+
+  useEffect(()=>{
+    if(booksContext.refreshBooks){
+      booksContext.refresh(false);
+      getListBooks(true)
+    }
+  },[booksContext.refreshBooks])
 
   useEffect(()=>{
     searchBooks();

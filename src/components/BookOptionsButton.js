@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
-import { update } from '../../BooksAPI';
-import { BooksContext } from '../../context/BooksContext';
+import { update } from '../BooksAPI';
+import { BooksContext } from '../context/BooksContext';
 
 const BookOptionsButton = ({bookID})=>{
 

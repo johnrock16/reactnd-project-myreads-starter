@@ -1,7 +1,7 @@
 import React,{useContext, useEffect,useState} from 'react';
 import {Link} from 'react-router-dom';
 import { getAll } from '../BooksAPI';
-import Shelf from '../components/Shelf/Shelf';
+import Shelf from '../components/Shelf';
 import { BooksContext } from '../context/BooksContext';
 import { getBooksShelfs} from '../utils';
 
