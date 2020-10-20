@@ -30,21 +30,16 @@ const SearchScreen = (props) => {
   }
 
   const searchBooks=async ()=>{
-    if(searchText.length<3){
-      setState((pv)=>({...pv,searchedBooks:[]}));
-      return;
-    }
     const bookSearch=await search(searchText);
 
-    const bookSearchSelfs=books.filter((item)=>{
+    const bookSearchShelfs=books.filter((item)=>{
       const search= searchText.toLowerCase().replace(/[\/\\]/g,'');
       const title=item.title.toLowerCase();
       const authors=item?.authors[0].toLowerCase();
       return (title.search(search)!==-1 || authors.search(search) !==-1);
     });
-
     
-    const result=(bookSearch.length>1)?bookSearch:bookSearchSelfs;
+    const result=(typeof bookSearch!=='undefined' && bookSearch.length>1)?bookSearch:bookSearchShelfs;
     setState((pv)=>({...pv,searchedBooks:result}));
   }
 
@@ -74,7 +69,7 @@ const SearchScreen = (props) => {
       <div className="search-books-results">
         <ol className="books-grid">
         {
-          (searchedBooks.length>0) && (searchedBooks.map((item,index)=>(
+          (searchText.length>2 && (typeof searchedBooks!=='undefined' && searchedBooks.length>0)) && (searchedBooks.map((item,index)=>(
             <li key={`search${item.title}${index}`}><Book bookID={item.id} title={item.title} author={arrayToText(item?.authors)} image={item?.imageLinks?.thumbnail}/></li>
           )))
         }
