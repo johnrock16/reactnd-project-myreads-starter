@@ -1,37 +1,60 @@
-import React, { createContext, useReducer, useEffect } from 'react';
+import React, { createContext, useState } from 'react';
 import { getBooksShelfs} from '../utils';
 import { getAll } from '../BooksAPI';
-import BookReducer, { initialStateBookReducer } from '../reducer/BooksReducer';
 
-export const BooksContext= createContext(initialStateBookReducer);
+const defaultValue={
+  booksShelf:[],
+  books:[],
+  refreshBooks:false,
+  setBooks:()=>{},
+  setBooksShelf:()=>{},
+  setState:()=>{},
+  refresh:()=>{},
+  getAllBooks:()=>({books:[],booksShelf:[]}),
+}
+
+export const BooksContext= createContext(defaultValue);
 
 export const BooksContextProvider=({children})=>{
 
-  const [state,dispatch] = useReducer(BookReducer, initialStateBookReducer);
+  const [state,setState] = useState(defaultValue);
 
-  const refresh=(v)=>{dispatch({type: 'refresh', payload: v})}
+  const {books,booksShelf,refreshBooks} = state;
 
-  useEffect(()=>{
-    if(state.refreshBooks) state.refresh(false); 
-    const getAllBooks=async (forced=true)=>{
-      if(!forced && state.booksShelf.length>0 && state.booksShelf.length>0){
-        return {booksShelf:state.booksShelf,books:state.books};
-      }
-      const books= await getAll();
-      const booksShelf=await getBooksShelfs(books);
+  const setBooks= (books)=>{
+    setState((pv)=>({...pv,books}))
+  }
+
+  const setBooksShelf= (booksShelf)=>{
+    setState((pv)=>({...pv,booksShelf}))
+  }
+
+  const refresh=(v)=>{
+    setState((pv)=>({...pv,refreshBooks:v}))
+  }
+
+  const getAllBooks=async (forced=true)=>{
+    if(!forced && booksShelf.length>0 && booksShelf.length>0){
       return {booksShelf,books};
     }
-    const listAllBooks =async ()=>dispatch({type: 'listAllBooks', payload: await getAllBooks(refresh)});
-    listAllBooks();
-  },[state]);
-
-  
+    else{
+      const books= await getAll();
+      const booksShelf=await getBooksShelfs(books);
+      setState((pv)=>({...pv,books,booksShelf}))
+      return {booksShelf,books};
+    }
+  }
 
   return(
     <BooksContext.Provider value={{
-      state,
-      dispatch,
+      books,
+      booksShelf,
+      setBooks,
+      setBooksShelf,
+      setState,
+      refreshBooks,
       refresh,
+      getAllBooks
     }}>
       {children}
     </BooksContext.Provider>

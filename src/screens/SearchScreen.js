@@ -1,19 +1,21 @@
-import React, { useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { search } from '../BooksAPI';
 import { BooksContext } from '../context/BooksContext';
 import Book from '../components/Book';
 import { arrayToText } from '../utils';
-import { search } from '../BooksAPI';
 
 const initialState={
+  books:[],
   searchText:'',
-  searchedBooks:[]
+  searchedBooks:[],
 }
 
 const SearchScreen = (props) => {
-  const [state,setState] =  useState(initialState)
+  const [state,setState] = useState(initialState)
   const booksContext= useContext(BooksContext);
-  const {searchText, searchedBooks} = state
+
+  const {books,searchText,searchedBooks} = state;
 
   const onHandleSearchText=(event)=>{
     const searchText=`${event.target.value}`;
@@ -21,30 +23,45 @@ const SearchScreen = (props) => {
   }
 
   useEffect(()=>{
-    const searchBooks=async ()=>{
-      const bookSearch= (searchText!=='') ? await search(searchText) : [];
+    const listAllBooks=async (forced)=>{
+      const listBooks=await booksContext.getAllBooks(forced);
+      setState((pv)=>({...pv,booksShelf:listBooks.booksShelf,books:listBooks.books}))
+    }
+    listAllBooks(booksContext.refreshBooks) 
+    if(booksContext.refreshBooks){
+      booksContext.refresh(false);
+    }
+  },[booksContext])
 
-      const bookSearchShelfs=(typeof booksContext.state.books!=='undefined' && booksContext.state.books.length>0)
-      ? booksContext.state.books.filter((item)=>{
+  useEffect(()=>{
+    let isMounting=true;
+    const searchBooks=async ()=>{
+      if(searchText.length>0){
+        const bookSearchShelfs=books.filter((item)=>{
           const search= searchText.toLowerCase().replace(/[\\]/g,'');
           const title=item.title.toLowerCase();
           const authors=item?.authors[0].toLowerCase();
           return (title.search(search)!==-1 || authors.search(search) !==-1);
-        })
-      : [];
-  
-      const idBooks=bookSearchShelfs.map((item)=>(item.id));
-      let searchResults=bookSearchShelfs;
-      
-      if(typeof bookSearch!=='undefined' && bookSearch.length>1){
-        searchResults= [...searchResults,...bookSearch].filter((item)=>(
-          !(idBooks.indexOf(item.id) !== -1 && typeof item.shelf ==='undefined')
-        ));
+        });
+    
+        const idBooks=bookSearchShelfs.map((item)=>(item.id));
+    
+        let searchResults=bookSearchShelfs;
+        search(searchText).then((bookSearch)=>{
+          if(typeof bookSearch!=='undefined' && bookSearch.length>1){
+            searchResults= [...searchResults,...bookSearch].filter((item)=>(
+              !(idBooks.indexOf(item.id) !== -1 && typeof item.shelf ==='undefined')
+            ));
+          }
+          if(isMounting){
+            setState((pv)=>({...pv,searchedBooks:searchResults}));
+          }
+        });
       }
-      setState((pv)=>({...pv,searchedBooks:searchResults}));
     }
     searchBooks();
-  },[searchText,booksContext.state.books])
+    return(()=>{isMounting=false;})
+  },[searchText,books])
 
   return (
     <div className="search-books">

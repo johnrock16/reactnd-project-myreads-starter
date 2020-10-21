@@ -1,12 +1,28 @@
-import React,{useContext} from 'react';
+import React,{useContext, useEffect,useState} from 'react';
 import {Link} from 'react-router-dom';
 import Shelf from '../components/Shelf';
 import { BooksContext } from '../context/BooksContext';
 
+const initialState={
+  booksShelf:[],
+}
 
 const MainScreen= ()=>{
+  const [state,setState] = useState(initialState);
   const booksContext= useContext(BooksContext);
-  const {booksShelf} = booksContext.state;
+
+  const {booksShelf} = state;
+
+  useEffect(()=>{
+    const listAllBooks=async (forced)=>{
+      const listBooks=await booksContext.getAllBooks(forced);
+      setState((pv)=>({...pv,booksShelf:listBooks.booksShelf,books:listBooks.books}))
+    }
+    listAllBooks(booksContext.refreshBooks) 
+    if(booksContext.refreshBooks){
+      booksContext.refresh(false);
+    }
+  },[booksContext])
 
   return(
     <div className="list-books">
@@ -16,8 +32,8 @@ const MainScreen= ()=>{
       <div className="list-books-content">
       {
         (typeof booksShelf !== 'undefined' && booksShelf.length>0) ? 
-          booksShelf.map((item,index)=>(
-            <Shelf key={`shelf${index}`} shelfName={item[0].shelf} books={item}/>
+        booksShelf.map((item,index)=>(
+          <Shelf key={`shelf${index}`} shelfName={item[0].shelf} books={item}/>
           ))
         :
         <span>Sorry but We don't find any book or shelf in your list</span>
