@@ -7,15 +7,15 @@ export const BooksContext= createContext(initialStateBookReducer);
 
 export const BooksContextProvider=({children})=>{
 
-  const [stateReduce,dispatch] = useReducer(BookReducer, initialStateBookReducer);
+  const [state,dispatch] = useReducer(BookReducer, initialStateBookReducer);
 
   const refresh=(v)=>{dispatch({type: 'refresh', payload: v})}
 
   useEffect(()=>{
-    if(stateReduce.refreshBooks) stateReduce.refresh(false); 
+    if(state.refreshBooks) state.refresh(false); 
     const getAllBooks=async (forced=true)=>{
-      if(!forced && stateReduce.booksShelf.length>0 && stateReduce.booksShelf.length>0){
-        return {booksShelf:stateReduce.booksShelf,books:stateReduce.books};
+      if(!forced && state.booksShelf.length>0 && state.booksShelf.length>0){
+        return {booksShelf:state.booksShelf,books:state.books};
       }
       const books= await getAll();
       const booksShelf=await getBooksShelfs(books);
@@ -23,13 +23,13 @@ export const BooksContextProvider=({children})=>{
     }
     const listAllBooks =async ()=>dispatch({type: 'listAllBooks', payload: await getAllBooks(refresh)});
     listAllBooks();
-  },[stateReduce]);
+  },[state]);
 
   
 
   return(
     <BooksContext.Provider value={{
-      stateReduce,
+      state,
       dispatch,
       refresh,
     }}>

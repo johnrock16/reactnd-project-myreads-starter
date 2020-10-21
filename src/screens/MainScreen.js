@@ -6,7 +6,7 @@ import { BooksContext } from '../context/BooksContext';
 
 const MainScreen= ()=>{
   const booksContext= useContext(BooksContext);
-  const {booksShelf} = booksContext.stateReduce;
+  const {booksShelf} = booksContext.state;
 
   return(
     <div className="list-books">

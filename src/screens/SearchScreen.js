@@ -24,8 +24,8 @@ const SearchScreen = (props) => {
     const searchBooks=async ()=>{
       const bookSearch= (searchText!=='') ? await search(searchText) : [];
 
-      const bookSearchShelfs=(typeof booksContext.stateReduce.books!=='undefined' && booksContext.stateReduce.books.length>0)
-      ? booksContext.stateReduce.books.filter((item)=>{
+      const bookSearchShelfs=(typeof booksContext.state.books!=='undefined' && booksContext.state.books.length>0)
+      ? booksContext.state.books.filter((item)=>{
           const search= searchText.toLowerCase().replace(/[\\]/g,'');
           const title=item.title.toLowerCase();
           const authors=item?.authors[0].toLowerCase();
@@ -44,7 +44,7 @@ const SearchScreen = (props) => {
       setState((pv)=>({...pv,searchedBooks:searchResults}));
     }
     searchBooks();
-  },[searchText,booksContext.stateReduce.books])
+  },[searchText,booksContext.state.books])
 
   return (
     <div className="search-books">
