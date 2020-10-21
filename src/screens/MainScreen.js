@@ -1,28 +1,23 @@
-import React,{useContext, useEffect,useState} from 'react';
+import React,{useContext} from 'react';
 import {Link} from 'react-router-dom';
 import Shelf from '../components/Shelf';
 import { BooksContext } from '../context/BooksContext';
 
-const initialState={
-  booksShelf:[],
-}
-
 const MainScreen= ()=>{
-  const [state,setState] = useState(initialState);
   const booksContext= useContext(BooksContext);
 
-  const {booksShelf} = state;
+  const {booksShelf} = booksContext;
 
-  useEffect(()=>{
-    const listAllBooks=async (forced)=>{
-      const listBooks=await booksContext.getAllBooks(forced);
-      setState((pv)=>({...pv,booksShelf:listBooks.booksShelf,books:listBooks.books}))
-    }
-    listAllBooks(booksContext.refreshBooks) 
-    if(booksContext.refreshBooks){
-      booksContext.refresh(false);
-    }
-  },[booksContext])
+  // useEffect(()=>{
+  //   const listAllBooks=async (forced)=>{
+  //     const listBooks=await booksContext.getAllBooks(forced);
+  //     setState((pv)=>({...pv,booksShelf:listBooks.booksShelf,books:listBooks.books}))
+  //   }
+  //   listAllBooks(booksContext.refreshBooks) 
+  //   if(booksContext.refreshBooks){
+  //     booksContext.refresh(false);
+  //   }
+  // },[booksContext])
 
   return(
     <div className="list-books">

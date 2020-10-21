@@ -15,23 +15,13 @@ const SearchScreen = (props) => {
   const [state,setState] = useState(initialState)
   const booksContext= useContext(BooksContext);
 
-  const {books,searchText,searchedBooks} = state;
+  const {searchText,searchedBooks} = state;
+  const {books} = booksContext;
 
   const onHandleSearchText=(event)=>{
     const searchText=`${event.target.value}`;
     setState((pv)=>({...pv,searchText}));
   }
-
-  useEffect(()=>{
-    const listAllBooks=async (forced)=>{
-      const listBooks=await booksContext.getAllBooks(forced);
-      setState((pv)=>({...pv,booksShelf:listBooks.booksShelf,books:listBooks.books}))
-    }
-    listAllBooks(booksContext.refreshBooks) 
-    if(booksContext.refreshBooks){
-      booksContext.refresh(false);
-    }
-  },[booksContext])
 
   useEffect(()=>{
     let isMounting=true;

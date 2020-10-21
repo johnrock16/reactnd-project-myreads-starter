@@ -45,6 +45,23 @@ export const BooksContextProvider=({children})=>{
     }
   }
 
+  React.useEffect(()=>{
+    const listAllBooks=async (forced)=>{
+      if(!forced && booksShelf.length>0 && booksShelf.length>0){
+        return;
+      }
+      else{
+        const books= await getAll();
+        const booksShelf=await getBooksShelfs(books);
+        setState((pv)=>({...pv,books,booksShelf}))
+      }
+    }
+    listAllBooks(refreshBooks) 
+    if(refreshBooks){
+      refresh(false);
+    }
+  },[refreshBooks,booksShelf])
+
   return(
     <BooksContext.Provider value={{
       books,
