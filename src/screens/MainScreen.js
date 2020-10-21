@@ -1,21 +1,12 @@
-import React,{useContext, useEffect,useReducer} from 'react';
+import React,{useContext} from 'react';
 import {Link} from 'react-router-dom';
 import Shelf from '../components/Shelf';
 import { BooksContext } from '../context/BooksContext';
-import BookReducer,{initialStateBookReducer} from '../reducer/BooksReducer';
 
 
 const MainScreen= ()=>{
-  const [state,dispatch] = useReducer(BookReducer, initialStateBookReducer);
   const booksContext= useContext(BooksContext);
-
-  const {booksShelf} = state;
-
-  useEffect(()=>{
-    if(booksContext.refreshBooks) booksContext.refresh(false); 
-    const listAllBooks =async ()=>dispatch({type: 'listAllBooks', payload: await booksContext.getAllBooks(booksContext.refresh)});
-    listAllBooks();
-  },[booksContext])
+  const {booksShelf} = booksContext.stateReduce;
 
   return(
     <div className="list-books">
