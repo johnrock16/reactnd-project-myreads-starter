@@ -1,17 +1,50 @@
-import React, { useContext} from 'react';
+import React, { useContext, useEffect, useState} from 'react';
 import { Link } from 'react-router-dom';
 import { BooksContext } from '../context/BooksContext';
 import Book from '../components/Book';
 import { arrayToText } from '../utils';
+import { search } from '../BooksAPI';
+
+const initialState={
+  searchText:'',
+  searchedBooks:[]
+}
 
 const SearchScreen = (props) => {
+  const [state,setState] =  useState(initialState)
   const booksContext= useContext(BooksContext);
-  const {searchText, searchedBooks} = booksContext.stateReduce;
+  const {searchText, searchedBooks} = state
 
   const onHandleSearchText=(event)=>{
     const searchText=`${event.target.value}`;
-    booksContext.dispatch({type: 'setSearchText', payload: searchText});
+    setState((pv)=>({...pv,searchText}));
   }
+
+  useEffect(()=>{
+    const searchBooks=async ()=>{
+      const bookSearch= (searchText!=='') ? await search(searchText) : [];
+
+      const bookSearchShelfs=(typeof booksContext.stateReduce.books!=='undefined' && booksContext.stateReduce.books.length>0)
+      ? booksContext.stateReduce.books.filter((item)=>{
+          const search= searchText.toLowerCase().replace(/[\\]/g,'');
+          const title=item.title.toLowerCase();
+          const authors=item?.authors[0].toLowerCase();
+          return (title.search(search)!==-1 || authors.search(search) !==-1);
+        })
+      : [];
+  
+      const idBooks=bookSearchShelfs.map((item)=>(item.id));
+      let searchResults=bookSearchShelfs;
+      
+      if(typeof bookSearch!=='undefined' && bookSearch.length>1){
+        searchResults= [...searchResults,...bookSearch].filter((item)=>(
+          !(idBooks.indexOf(item.id) !== -1 && typeof item.shelf ==='undefined')
+        ));
+      }
+      setState((pv)=>({...pv,searchedBooks:searchResults}));
+    }
+    searchBooks();
+  },[searchText,booksContext.stateReduce.books])
 
   return (
     <div className="search-books">
