@@ -5,7 +5,7 @@ My-Reads is a web application developed using React JS for Udacity's React Cours
 
 ## Installation
 
-For install My-Reads you need install npm before.
+To install my-reads you need to install npm first
 ```bash
 npm install
 ```
@@ -17,4 +17,4 @@ npm start
 ```
 
 ## Contributing
-this project doesn't accept contribuittions
+This project doesn't accept contribuittions
