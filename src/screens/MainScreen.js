@@ -1,33 +1,21 @@
-import React,{useContext, useEffect,useState} from 'react';
+import React,{useContext, useEffect,useReducer} from 'react';
 import {Link} from 'react-router-dom';
 import Shelf from '../components/Shelf';
 import { BooksContext } from '../context/BooksContext';
+import BookReducer,{initialStateBookReducer} from '../reducer/BooksReducer';
 
-const initialState={
-  booksShelf:[],
-}
 
 const MainScreen= ()=>{
-  const [state,setState] = useState(initialState);
+  const [state,dispatch] = useReducer(BookReducer, initialStateBookReducer);
   const booksContext= useContext(BooksContext);
 
   const {booksShelf} = state;
 
-  const listAllBooks=async (forced=false)=>{
-    const listBooks=await booksContext.getAllBooks(forced);
-    setState((pv)=>({...pv,booksShelf:listBooks.booksShelf,books:listBooks.books}))
-  }
-
   useEffect(()=>{
+    if(booksContext.refreshBooks) booksContext.refresh(false); 
+    const listAllBooks =async ()=>dispatch({type: 'listAllBooks', payload: await booksContext.getAllBooks(booksContext.refresh)});
     listAllBooks();
-  },[])
-
-  useEffect(()=>{
-    if(booksContext.refreshBooks){
-      booksContext.refresh(false);
-      listAllBooks(true)
-    }
-  },[booksContext.refreshBooks])
+  },[booksContext])
 
   return(
     <div className="list-books">
@@ -36,9 +24,12 @@ const MainScreen= ()=>{
       </div>
       <div className="list-books-content">
       {
-        booksShelf.map((item,index)=>(
-          <Shelf key={`shelf${index}`} shelfName={item[0].shelf} books={item}/>
-        ))
+        (typeof booksShelf !== 'undefined' && booksShelf.length>0) ? 
+          booksShelf.map((item,index)=>(
+            <Shelf key={`shelf${index}`} shelfName={item[0].shelf} books={item}/>
+          ))
+        :
+        <span>Sorry but We don't find any book or shelf in your list</span>
       }
       </div>
       <div className="open-search">

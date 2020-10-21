@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useReducer, useEffect } from 'react';
 import { update } from '../BooksAPI';
 import { BooksContext } from '../context/BooksContext';
 
@@ -6,8 +6,17 @@ const initialState={
     shelf:''
 }
 
+function reducer(state, action) {
+    switch (action.type) {
+      case 'changeShelf':
+        return {shelf: action.payload};
+      default:
+        throw new Error();
+    }
+  }
+
 const BookOptionsButton = ({bookID,bookShelf})=>{
-    const [state,setState] = useState(initialState)
+    const [state,dispatch] = useReducer(reducer, initialState);
     const {shelf} = state;
 
     const booksContext= useContext(BooksContext);
@@ -16,12 +25,12 @@ const BookOptionsButton = ({bookID,bookShelf})=>{
         const {value}=event.target;
         await update(bookID,value)
         booksContext.refresh(true);
-        setState((pv)=>({...pv,shelf:value}));
+        dispatch({type: 'changeShelf', payload: value})
     }
 
-    React.useEffect(() => {
-        setState((pv)=>({...pv,shelf:bookShelf}));
-    }, [])
+    useEffect(() => {
+        dispatch({type: 'changeShelf', payload: bookShelf})
+    }, [bookShelf])
 
     return(
         <div className="book-shelf-changer">

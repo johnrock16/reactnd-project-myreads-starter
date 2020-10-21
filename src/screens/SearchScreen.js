@@ -1,67 +1,53 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useReducer } from 'react';
 import { Link } from 'react-router-dom';
 import { search } from '../BooksAPI';
 import { BooksContext } from '../context/BooksContext';
 import Book from '../components/Book';
 import { arrayToText } from '../utils';
-
-const initialState={
-  books:[],
-  searchText:'',
-  searchedBooks:[],
-}
+import BookReducer, { initialStateBookReducer } from '../reducer/BooksReducer';
 
 const SearchScreen = (props) => {
-  const [state,setState] = useState(initialState)
+  const [state,dispatch] = useReducer(BookReducer, initialStateBookReducer);
   const booksContext= useContext(BooksContext);
 
   const {books,searchText,searchedBooks} = state;
 
   const onHandleSearchText=(event)=>{
     const searchText=`${event.target.value}`;
-    setState((pv)=>({...pv,searchText}));
-  }
-
-  const listAllBooks=async (forced=false)=>{
-    const listBooks=await booksContext.getAllBooks(forced);
-    setState((pv)=>({...pv,booksShelf:listBooks.booksShelf,books:listBooks.books}))
-  }
-
-  const searchBooks=async ()=>{
-    const bookSearch=await search(searchText);
-
-    const bookSearchShelfs=books.filter((item)=>{
-      const search= searchText.toLowerCase().replace(/[\\]/g,'');
-      const title=item.title.toLowerCase();
-      const authors=item?.authors[0].toLowerCase();
-      return (title.search(search)!==-1 || authors.search(search) !==-1);
-    });
-
-    const idBooks=bookSearchShelfs.map((item)=>(item.id));
-
-    let searchResults=bookSearchShelfs;
-    if(typeof bookSearch!=='undefined' && bookSearch.length>1){
-      searchResults= [...searchResults,...bookSearch].filter((item)=>(
-        !(idBooks.indexOf(item.id) !== -1 && typeof item.shelf ==='undefined')
-      ));
-    }
-    setState((pv)=>({...pv,searchedBooks:searchResults}));
+    dispatch({type: 'setSearchText', payload: searchText});
   }
 
   useEffect(()=>{
+    if(booksContext.refreshBooks) booksContext.refresh(false); 
+    const listAllBooks =async ()=>dispatch({type: 'listAllBooks', payload: await booksContext.getAllBooks(booksContext.refresh)});
     listAllBooks();
-  },[])
+  },[booksContext])
 
   useEffect(()=>{
-    if(booksContext.refreshBooks){
-      booksContext.refresh(false);
-      listAllBooks(true);
+    const searchBooks=async ()=>{
+      const bookSearch= (searchText!=='') ? await search(searchText) : [];
+  
+      const bookSearchShelfs=(typeof books!=='undefined' && books.length>0)
+      ? books.filter((item)=>{
+          const search= searchText.toLowerCase().replace(/[\\]/g,'');
+          const title=item.title.toLowerCase();
+          const authors=item?.authors[0].toLowerCase();
+          return (title.search(search)!==-1 || authors.search(search) !==-1);
+        })
+      : [];
+  
+      const idBooks=bookSearchShelfs.map((item)=>(item.id));
+  
+      let searchResults=bookSearchShelfs;
+      if(typeof bookSearch!=='undefined' && bookSearch.length>1){
+        searchResults= [...searchResults,...bookSearch].filter((item)=>(
+          !(idBooks.indexOf(item.id) !== -1 && typeof item.shelf ==='undefined')
+        ));
+      }
+      dispatch({type: 'searchBooks', payload: searchResults});
     }
-  },[booksContext.refreshBooks])
-
-  useEffect(()=>{
     searchBooks();
-  },[searchText])
+  },[searchText,books])
 
   return (
     <div className="search-books">
@@ -74,7 +60,7 @@ const SearchScreen = (props) => {
       <div className="search-books-results">
         <ol className="books-grid">
         {
-          (searchText.length>2 && (typeof searchedBooks!=='undefined' && searchedBooks.length>0)) && (searchedBooks.map((item,index)=>(
+          ((typeof searchedBooks!=='undefined' && searchText.length>2) && (typeof searchedBooks!=='undefined' && searchedBooks.length>0)) && (searchedBooks.map((item,index)=>(
             <li key={`search${item.title}${index}`}>
               <Book bookID={item.id} title={item.title} author={arrayToText(item?.authors)} shelf={item?.shelf} image={item?.imageLinks?.thumbnail}/>
             </li>
