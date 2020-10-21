@@ -11,7 +11,6 @@ const defaultValue={
   setBooksShelf:()=>{},
   setState:()=>{},
   refresh:()=>{},
-  getAllBooks:()=>({books:[],booksShelf:[]}),
 }
 
 export const BooksContext= createContext(defaultValue);
@@ -35,28 +34,15 @@ export const BooksContextProvider=({children})=>{
     setState((pv)=>({...pv,refreshBooks:v}))
   }
 
-  const getAllBooks=async (forced=true)=>{
-    if(!forced && booksShelf.length>0 && booksShelf.length>0){
-      return {booksShelf,books};
-    }
-    else{
-      const books= await getAll();
-      const booksShelf=await getBooksShelfs(books);
-      return {booksShelf,books};
-    }
-  }
-
   useEffect(()=>{
     if(state.refreshBooks) state.refresh(false); 
     const getAllBooks=async (forced=true)=>{
       if(!forced && state.booksShelf.length>0 && state.booksShelf.length>0){
         return {booksShelf:state.booksShelf,books:state.books};
       }
-      else{
-        const books= await getAll();
-        const booksShelf=await getBooksShelfs(books);
-        return {booksShelf,books};
-      }
+      const books= await getAll();
+      const booksShelf=await getBooksShelfs(books);
+      return {booksShelf,books};
     }
     const listAllBooks =async ()=>dispatch({type: 'listAllBooks', payload: await getAllBooks(refresh)});
     listAllBooks();
@@ -99,7 +85,6 @@ export const BooksContextProvider=({children})=>{
       dispatch,
       refreshBooks,
       refresh,
-      getAllBooks
     }}>
       {children}
     </BooksContext.Provider>
