@@ -13,6 +13,7 @@ const BooksApp = ()=>{
       <div className="app">
         <BooksContextProvider>
           <Route path={'/search'} component={SearchScreen}/>
+          <Route path={'/reactnd-project-myreads-starter'} component={MainScreen}/>
           <Route exact path={'/'} component={MainScreen}/>
         </BooksContextProvider>
       </div>
